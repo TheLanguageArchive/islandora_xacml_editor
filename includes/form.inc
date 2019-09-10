@@ -86,6 +86,20 @@ function islandora_xacml_editor_form($form, &$form_state, $object) {
     $xacml = new Xacml();
   }
 
+  # modification to include users who have never logged in but are present in the existing XACML
+  $management_users_from_xacml = islandora_xacml_editor_retrieve_users($xacml, $new_xacml, 'management');
+  $management_users_with_keys = array_combine($management_users_from_xacml, $management_users_from_xacml);
+  $management_users = array_unique(array_merge($users,  $management_users_with_keys));
+  natcasesort($management_users);
+  $viewing_users_from_xacml = islandora_xacml_editor_retrieve_users($xacml, $new_xacml, 'viewing');
+  $viewing_users_with_keys = array_combine($viewing_users_from_xacml, $viewing_users_from_xacml);
+  $viewing_users = array_unique(array_merge($users,  $viewing_users_with_keys));
+  natcasesort($viewing_users);
+  $datastream_users_from_xacml = islandora_xacml_editor_retrieve_users($xacml, $new_xacml, 'datastream');
+  $datastream_users_with_keys = array_combine($datastream_users_from_xacml, $datastream_users_from_xacml);
+  $datastream_users = array_unique(array_merge($users,  $datastream_users_with_keys));
+  natcasesort($datastream_users);
+
   $form = array(
     '#tree' => TRUE,
   );
@@ -113,7 +127,7 @@ function islandora_xacml_editor_form($form, &$form_state, $object) {
     '#type' => 'select',
     '#title' => t('Allowed Users'),
     '#default_value' => islandora_xacml_editor_retrieve_users($xacml, $new_xacml, 'viewing'),
-    '#options' => $users,
+    '#options' => $viewing_users,
     '#multiple' => TRUE,
     '#size' => 10,
     '#prefix' => '<div class="islandora_xacml_selects">',
@@ -158,7 +172,7 @@ function islandora_xacml_editor_form($form, &$form_state, $object) {
   $form['manage']['users'] = array(
     '#type' => 'select',
     '#title' => t('Users'),
-    '#options' => $users,
+    '#options' => $management_users,
     '#default_value' => islandora_xacml_editor_retrieve_users($xacml, $new_xacml, 'management'),
     '#multiple' => TRUE,
     '#size' => 10,
@@ -250,7 +264,7 @@ function islandora_xacml_editor_form($form, &$form_state, $object) {
   $form['dsid_mime']['users'] = array(
     '#type' => 'select',
     '#title' => t('Users'),
-    '#options' => $users,
+    '#options' => $datastream_users,
     '#default_value' => islandora_xacml_editor_retrieve_users($xacml, $new_xacml, 'datastream'),
     '#multiple' => TRUE,
     '#size' => 10,
