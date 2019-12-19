@@ -86,20 +86,28 @@ function islandora_xacml_editor_form($form, &$form_state, $object) {
     $xacml = new Xacml();
   }
 
-  # modification to include users who have never logged in but are present in the existing XACML
+  # modification to include users who have never logged in but are present in the existing XACML. If no policy is present, islandora XACML returns 'admin' string.
+  $management_users = [];
   $management_users_from_xacml = islandora_xacml_editor_retrieve_users($xacml, $new_xacml, 'management');
-  $management_users_with_keys = array_combine($management_users_from_xacml, $management_users_from_xacml);
-  $management_users = array_unique(array_merge($users,  $management_users_with_keys));
-  natcasesort($management_users);
+  if ($management_users_from_xacml !== 'admin') {
+    $management_users_with_keys = array_combine($management_users_from_xacml, $management_users_from_xacml);
+    $management_users = array_unique(array_merge($users,  $management_users_with_keys));
+    natcasesort($management_users);
+  }
+  $viewing_users = [];
   $viewing_users_from_xacml = islandora_xacml_editor_retrieve_users($xacml, $new_xacml, 'viewing');
-  $viewing_users_with_keys = array_combine($viewing_users_from_xacml, $viewing_users_from_xacml);
-  $viewing_users = array_unique(array_merge($users,  $viewing_users_with_keys));
-  natcasesort($viewing_users);
+  if ($viewing_users_from_xacml !== 'admin') {
+    $viewing_users_with_keys = array_combine($viewing_users_from_xacml, $viewing_users_from_xacml);
+    $viewing_users = array_unique(array_merge($users,  $viewing_users_with_keys));
+    natcasesort($viewing_users);
+  }
+  $datastream_users = [];
   $datastream_users_from_xacml = islandora_xacml_editor_retrieve_users($xacml, $new_xacml, 'datastream');
-  $datastream_users_with_keys = array_combine($datastream_users_from_xacml, $datastream_users_from_xacml);
-  $datastream_users = array_unique(array_merge($users,  $datastream_users_with_keys));
-  natcasesort($datastream_users);
-
+  if ($datastream_users_from_xacml !== 'admin') {
+    $datastream_users_with_keys = array_combine($datastream_users_from_xacml, $datastream_users_from_xacml);
+    $datastream_users = array_unique(array_merge($users,  $datastream_users_with_keys));
+    natcasesort($datastream_users);
+  }
   $form = array(
     '#tree' => TRUE,
   );
